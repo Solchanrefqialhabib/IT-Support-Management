@@ -18,6 +18,12 @@ export const exportVisitsExcel = async (req, res) => {
     const { startDate, endDate } = req.query;
     const dateFilter = getDateFilter(startDate, endDate);
 
+    // Ambil data user secara langsung dari database agar nama & jabatan sesuai akun yang login
+    const currentUser = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { name: true, role: true }
+    });
+
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Laporan Perjalanan Dinas');
 
@@ -26,12 +32,11 @@ export const exportVisitsExcel = async (req, res) => {
     sheet.getCell('A1').font = { bold: true, size: 14 };
     sheet.getCell('A1').alignment = { horizontal: 'center' };
 
-    // --- PERBAIKAN: Mengambil nama dan role secara dinamis dari user yang login ---
     sheet.getCell('A3').value = 'Nama:'; 
-    sheet.getCell('B3').value = req.user?.name || 'Staff IT';
+    sheet.getCell('B3').value = currentUser?.name || 'Staff IT';
     
     sheet.getCell('A4').value = 'Jabatan:'; 
-    sheet.getCell('B4').value = req.user?.role === 'IT_SUPPORT' ? 'IT Support' : (req.user?.role || 'Staff IT & Support');
+    sheet.getCell('B4').value = currentUser?.role === 'IT_SUPPORT' ? 'IT Support' : (currentUser?.role || 'Staff IT & Support');
     
     sheet.getCell('A5').value = 'Periode:'; 
     sheet.getCell('B5').value = startDate && endDate ? `${startDate} s/d ${endDate}` : 'Semua Periode';
