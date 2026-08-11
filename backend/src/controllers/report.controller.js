@@ -26,8 +26,13 @@ export const exportVisitsExcel = async (req, res) => {
     sheet.getCell('A1').font = { bold: true, size: 14 };
     sheet.getCell('A1').alignment = { horizontal: 'center' };
 
-    sheet.getCell('A3').value = 'Nama:'; sheet.getCell('B3').value = req.user?.name || 'Staff IT';
-    sheet.getCell('A4').value = 'Jabatan:'; sheet.getCell('B4').value = 'Staff IT & Support';
+    // --- PERBAIKAN: Mengambil nama dan role secara dinamis dari user yang login ---
+    sheet.getCell('A3').value = 'Nama:'; 
+    sheet.getCell('B3').value = req.user?.name || 'Staff IT';
+    
+    sheet.getCell('A4').value = 'Jabatan:'; 
+    sheet.getCell('B4').value = req.user?.role === 'IT_SUPPORT' ? 'IT Support' : (req.user?.role || 'Staff IT & Support');
+    
     sheet.getCell('A5').value = 'Periode:'; 
     sheet.getCell('B5').value = startDate && endDate ? `${startDate} s/d ${endDate}` : 'Semua Periode';
 
@@ -47,7 +52,6 @@ export const exportVisitsExcel = async (req, res) => {
     });
 
     visits.forEach((v, index) => {
-      // --- PERBAIKAN: Format link dan simpan ke variabel 'row' ---
       const row = sheet.addRow([
         index + 1,
         new Date(v.date).toLocaleDateString('id-ID'),
@@ -60,7 +64,6 @@ export const exportVisitsExcel = async (req, res) => {
         v.status || '-'
       ]);
 
-      // --- PERBAIKAN: Berikan warna biru & garis bawah (underline) pada link ---
       if (v.beforeImage) {
         row.getCell(7).font = { color: { argb: 'FF0000FF' }, underline: true };
       }
@@ -69,7 +72,6 @@ export const exportVisitsExcel = async (req, res) => {
       }
     });
 
-    // --- PERBAIKAN: Lebar kolom disesuaikan agar rapi ---
     sheet.columns = [
       { width: 6 }, { width: 15 }, { width: 22 }, { width: 30 }, { width: 35 }, { width: 35 }, { width: 15 }, { width: 15 }, { width: 15 }
     ];
@@ -83,7 +85,6 @@ export const exportVisitsExcel = async (req, res) => {
             bottom: { style: 'thin', color: { argb: 'D3D3D3' } },
             right: { style: 'thin', color: { argb: 'D3D3D3' } }
           };
-          // --- PERBAIKAN: Teks yang panjang akan turun ke bawah, bukan memanjang ---
           cell.alignment = { vertical: 'top', wrapText: true }; 
         });
       }

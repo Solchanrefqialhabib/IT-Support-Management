@@ -116,6 +116,7 @@ export const createVisit = async (req, res) => {
       },
     });
 
+    // PERBAIKAN WA: Pastikan pengiriman pesan tidak memblokir respon sukses jika nomor WA belum diset
     const targetNumber = process.env.WA_GROUP_NUMBER || process.env.WA_TARGET_NUMBER;
     if (targetNumber) {
       const message = `🔔 *LAPORAN KUNJUNGAN BARU*\n\n` +
