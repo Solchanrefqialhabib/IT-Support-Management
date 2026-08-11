@@ -1,0 +1,43 @@
+# Backend - Perbaikan Project
+- [x] Baca semua file existing
+- [ ] Fix config/prisma.js - tambah error handling, connection pool
+- [ ] Fix app.js - tambah semua routes yang hilang
+- [ ] Complete user.controller.js - CRUD user
+- [ ] Complete user.routes.js - routes user dengan middleware
+- [ ] Buat branch.controller.js - CRUD cabang
+- [ ] Buat branch.routes.js - routes cabang
+- [ ] Buat visit.controller.js - CRUD kunjungan
+- [ ] Buat visit.routes.js - routes kunjungan
+- [ ] Buat item.controller.js - CRUD barang
+- [ ] Buat item.routes.js - routes barang
+- [ ] Buat checkout.controller.js - CRUD checkout barang
+- [ ] Buat checkout.routes.js - routes checkout barang
+- [ ] Buat return.controller.js - CRUD return barang
+- [ ] Buat return.routes.js - routes return barang
+- [ ] Buat dashboard.controller.js - statistik
+- [ ] Buat dashboard.routes.js - routes dashboard
+- [ ] Buat report.controller.js - laporan excel
+- [ ] Buat report.routes.js - routes report
+- [ ] Buat wa.controller.js - WhatsApp integration
+- [ ] Buat wa.routes.js - routes WhatsApp
+- [ ] Buat auth.middleware.js - fix & tambah role middleware
+
+# Frontend - Perbaikan Project
+- [ ] Buat struktur folder (components, pages, services, context)
+- [ ] Buat API service layer (axios)
+- [ ] Buat AuthContext
+- [ ] Buat ProtectedRoute
+- [ ] Buat Layout dengan sidebar
+- [ ] Buat Login page
+- [ ] Buat Register page
+- [ ] Buat Dashboard page
+- [ ] Buat Users page (CRUD)
+- [ ] Buat Branches page (CRUD)
+- [ ] Buat Visits page (CRUD)
+- [ ] Buat Items page (CRUD)
+- [ ] Buat Checkouts page (CRUD)
+- [ ] Buat Returns page (CRUD)
+- [ ] Buat Reports page
+- [ ] Update App.jsx dengan routing
+- [ ] Update main.jsx
+- [ ] Update index.css dengan style
