@@ -56,7 +56,6 @@ export const sendDailyReport = async (req, res) => {
       take: 10,
       include: {
         user: { select: { name: true } },
-        // PERBAIKAN: Menambahkan allowance pada relasi branch agar bisa dihitung
         branch: { select: { name: true, allowance: true } } 
       },
       orderBy: { createdAt: 'desc' }
@@ -70,7 +69,6 @@ export const sendDailyReport = async (req, res) => {
     let text = `*📊 REKAP KUNJUNGAN IT SUPPORT*\n📅 Laporan Terbaru\n\n`;
 
     visits.forEach((v, i) => {
-      // PERBAIKAN: Kalkulasi fallback yang benar (Visit Allowance ATAU Branch Allowance)
       const allowanceVal = Number(v.allowance || v.branch?.allowance || 0);
       totalAllowance += allowanceVal;
 
@@ -86,7 +84,7 @@ export const sendDailyReport = async (req, res) => {
 
     const targetNumber = process.env.WA_GROUP_NUMBER;
     if (!targetNumber) {
-      throw new Error("Nomor tujuan (WA_GROUP_NUMBER) belum disetting di file .env backend");
+      return res.status(500).json({ success: false, message: "Nomor tujuan (WA_GROUP_NUMBER) belum disetting di file .env backend" });
     }
 
     await sendWAMessage(targetNumber, text);

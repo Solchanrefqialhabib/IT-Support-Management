@@ -19,13 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "IT Support Management API",
-    version: "1.0.0",
-  });
+  res.json({ message: "IT Support Management API", version: "1.0.0" });
 });
 
-// Mounting semua rute API
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/branches", branchRoutes);
@@ -35,6 +31,7 @@ app.use("/api/checkouts", checkoutRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
-app.use("/api/wa", waRoutes);
+// Didaftarkan sebagai /api/wa agar sinkron dengan frontend
+app.use("/api/wa", waRoutes); 
 
 export default app;

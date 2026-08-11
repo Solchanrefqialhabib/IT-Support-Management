@@ -9,7 +9,8 @@ import { useAuth } from '../context/AuthContext';
 
 export default function CheckoutsPage() {
   const { user } = useAuth();
-  const isSupervisor = user?.role === 'SUPERVISOR';
+  // Hanya IT_SUPPORT yang memiliki akses penuh, Admin & Supervisor murni pemantau
+  const isITSupport = user?.role === 'IT_SUPPORT';
 
   const [checkouts, setCheckouts] = useState([]);
   const [items, setItems] = useState([]);
@@ -44,11 +45,13 @@ export default function CheckoutsPage() {
   }, []);
 
   const openCreateModal = () => {
+    if (!isITSupport) return;
     reset({ date: new Date().toISOString().slice(0, 10), quantity: 1, purpose: '' });
     setCreateModal(true);
   };
 
   const onSubmit = async (values) => {
+    if (!isITSupport) return;
     try {
       const payload = {
         itemId: Number(values.itemId),
@@ -62,14 +65,14 @@ export default function CheckoutsPage() {
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Barang berhasil dikeluarkan, stok otomatis berkurang!', background: '#09090b', color: '#fff', timer: 2000, showConfirmButton: false });
       
       setCreateModal(false);
-      loadData(); // Refresh tabel checkout
+      loadData();
     } catch (e) {
       Swal.fire({ icon: 'error', title: 'Gagal Checkout', text: e.message, background: '#09090b', color: '#fff' });
     }
   };
 
   const handleDelete = async (id) => {
-    if (isSupervisor) return;
+    if (!isITSupport) return;
     Swal.fire({
       title: 'Batalkan Checkout?',
       text: "Stok barang akan dikembalikan ke gudang.",
@@ -98,7 +101,7 @@ export default function CheckoutsPage() {
         title="Pengeluaran Aset (Checkout)" 
         description="Catat barang yang dipakai/dipinjam ke cabang. Stok akan terpotong otomatis." 
         action={
-          !isSupervisor && (
+          isITSupport && (
             <button className="primary-button" onClick={openCreateModal}>
               <FiPlus /> Buat Checkout Baru
             </button>
@@ -120,7 +123,7 @@ export default function CheckoutsPage() {
                   <th>Cabang Tujuan</th>
                   <th>Tujuan Penggunaan</th>
                   <th>Teknisi / User</th>
-                  {!isSupervisor && <th style={{ textAlign: 'center' }}>Aksi</th>}
+                  {isITSupport && <th style={{ textAlign: 'center' }}>Aksi</th>}
                 </tr>
               </thead>
               <tbody>
@@ -135,7 +138,7 @@ export default function CheckoutsPage() {
                     <td>{co.branch?.name}</td>
                     <td>{co.notes}</td>
                     <td>{co.user?.name}</td>
-                    {!isSupervisor && (
+                    {isITSupport && (
                       <td style={{ textAlign: 'center' }}>
                         <button 
                           onClick={() => handleDelete(co.id)} 
@@ -157,7 +160,7 @@ export default function CheckoutsPage() {
       </section>
 
       {/* MODAL CHECKOUT */}
-      {createModal && !isSupervisor && (
+      {createModal && isITSupport && (
         <div className="modal-backdrop">
           <div className="modal" style={{ width: '100%', maxWidth: '500px', padding: '24px 32px' }}>
             <button type="button" className="modal-close" onClick={() => setCreateModal(false)}><FiX /></button>
@@ -170,7 +173,6 @@ export default function CheckoutsPage() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              
               <div>
                 <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px', color: '#fff' }}>Pilih Barang (Hanya yang berstok)</label>
                 <select 

@@ -1,3 +1,19 @@
+# Dependencies
 node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Environment variables
 .env
+backend/.env
+frontend/.env
+
+# WhatsApp Session / Credentials (PENTING AGAR TIDAK KE-UPLOAD KE GITHUB)
+backend/wa_credentials/
+
+# Uploaded Files
+backend/uploads/
+
+# Build outputs
 dist/
+build/

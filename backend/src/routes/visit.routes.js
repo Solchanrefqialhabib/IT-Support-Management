@@ -18,7 +18,7 @@ router.use(authMiddleware);
 router.get("/", getVisits);
 router.get("/:id", getVisitById);
 
-// Hanya IT_SUPPORT yang diizinkan mencatat/mengubah kunjungan lapangan. Admin hanya memantau.
+// Hanya IT_SUPPORT yang dapat melakukan aksi tulis/ubah/hapus data kunjungan
 router.post("/", requireRole("IT_SUPPORT"), upload.fields([{ name: 'beforeImage', maxCount: 1 }, { name: 'afterImage', maxCount: 1 }]), createVisit);
 router.put("/:id", requireRole("IT_SUPPORT"), upload.fields([{ name: 'beforeImage', maxCount: 1 }, { name: 'afterImage', maxCount: 1 }]), updateVisit);
 router.patch("/:id/status", requireRole("IT_SUPPORT"), updateVisitStatus);

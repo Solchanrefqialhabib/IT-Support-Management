@@ -15,9 +15,8 @@ const statusList = ['SELESAI', 'PENDING', 'PROSES', 'BATAL'];
 export default function VisitsPage() {
   const { user } = useAuth(); 
   
-  const isAdmin = user?.role === 'ADMIN';
-  const isSupervisor = user?.role === 'SUPERVISOR';
-  const isRestrictedRole = isAdmin || isSupervisor; // Admin & Supervisor murni pemantau
+  // HANYA IT_SUPPORT yang memiliki akses penuh untuk input dan kirim WA
+  const isITSupport = user?.role === 'IT_SUPPORT';
 
   const [visits, setVisits] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -48,11 +47,42 @@ export default function VisitsPage() {
         setVisits(v.data || v); 
         setBranches(b.data || b); 
       })
-      .catch((e) => Swal.fire({ icon: 'error', title: 'Gagal', text: e.message, background: '#09090b', color: '#fff' }))
+      .catch((e) => Swal.fire({ icon: 'error', title: 'Gagal', text: e?.message || 'Gagal memuat data', background: '#09090b', color: '#fff' }))
       .finally(() => setLoading(false));
   };
   
   useEffect(loadData, []);
+
+  const handleSendDailyReportWA = async () => {
+    if (!isITSupport) return;
+    try {
+      Swal.fire({
+        title: 'Mengirim Laporan...',
+        text: 'Mohon tunggu sebentar, sedang mengirim rekap ke WhatsApp.',
+        allowOutsideClick: false,
+        background: '#09090b', color: '#fff',
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      const res = await api.post('/wa/daily-report');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: res?.data?.message || 'Laporan rekap kunjungan berhasil dikirim ke WhatsApp.',
+        background: '#09090b', color: '#fff'
+      });
+    } catch (error) {
+      const errorMsg = error?.response?.data?.message || error?.message || 'Terjadi kesalahan pada server.';
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Kirim WA',
+        text: errorMsg,
+        background: '#09090b', color: '#fff'
+      });
+    }
+  };
 
   const handleBranchToggle = (branchId) => {
     setSelectedBranches(prev => 
@@ -67,7 +97,7 @@ export default function VisitsPage() {
   };
 
   const openEditModal = (visit) => {
-    if (isRestrictedRole) return; 
+    if (!isITSupport) return; 
     setEditingVisit(visit);
     setValue('date', visit.date ? visit.date.slice(0, 10) : today);
     setValue('status', visit.status || 'SELESAI');
@@ -91,7 +121,7 @@ export default function VisitsPage() {
   };
 
   const openCreateModal = () => {
-    if (isRestrictedRole) return; 
+    if (!isITSupport) return; 
     setEditingVisit(null);
     setSelectedBranches([]);
     setSelectedCategories([]);
@@ -102,7 +132,7 @@ export default function VisitsPage() {
   };
 
   const handleDeleteVisit = async (id) => {
-    if (isRestrictedRole) return;
+    if (!isITSupport) return;
     Swal.fire({
       title: 'Hapus Kunjungan?',
       text: "Data log kunjungan ini akan dihapus permanen.",
@@ -118,14 +148,14 @@ export default function VisitsPage() {
           Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Data kunjungan berhasil dihapus.', background: '#09090b', color: '#fff', timer: 1200, showConfirmButton: false });
           loadData();
         } catch (e) {
-          Swal.fire({ icon: 'error', title: 'Gagal', text: e.message, background: '#09090b', color: '#fff' });
+          Swal.fire({ icon: 'error', title: 'Gagal', text: e?.message || 'Gagal menghapus', background: '#09090b', color: '#fff' });
         }
       }
     });
   };
 
   const submit = async (values) => {
-    if (isRestrictedRole) return;
+    if (!isITSupport) return;
     try {
       if (selectedBranches.length === 0) {
         Swal.fire({ icon: 'warning', title: 'Pilih minimal 1 cabang tujuan', background: '#09090b', color: '#fff' });
@@ -171,7 +201,7 @@ export default function VisitsPage() {
       reset({ date: today, status: 'SELESAI', startTime: '08:00', endTime: '17:00' });
       loadData();
     } catch (e) {
-      Swal.fire({ icon: 'error', title: 'Gagal', text: e.message, background: '#09090b', color: '#fff' });
+      Swal.fire({ icon: 'error', title: 'Gagal', text: e?.message || 'Gagal menyimpan', background: '#09090b', color: '#fff' });
     }
   };
 
@@ -209,6 +239,20 @@ export default function VisitsPage() {
         description="Pencatatan aktivitas lapangan dan dokumentasi foto." 
         action={
           <div style={{ display: 'flex', gap: '10px' }}>
+            {/* Tombol Catat Kunjungan HANYA MUNCUL untuk IT Support */}
+            {isITSupport && (
+              <button className="primary-button" onClick={openCreateModal}>
+                <FiPlus /> Catat Kunjungan
+              </button>
+            )}
+
+            {/* Tombol Kirim Laporan WA HANYA MUNCUL untuk IT Support */}
+            {isITSupport && (
+              <button className="primary-button" style={{ background: '#22c55e', color: '#fff', border: 'none' }} onClick={handleSendDailyReportWA}>
+                <FiMessageSquare /> Kirim Laporan WA
+              </button>
+            )}
+
             <button className="primary-button" style={{ background: 'transparent', color: 'var(--text-main)' }} onClick={() => setShowExportModal(true)}>
               <FiDownload /> Excel
             </button>
@@ -243,8 +287,7 @@ export default function VisitsPage() {
                   <th>Uang Jalan</th>
                   <th>Dokumentasi</th>
                   <th>Status</th>
-                  {/* Kolom Aksi HANYA MUNCUL untuk IT Support */}
-                  {!isRestrictedRole && <th style={{ textAlign: 'center' }}>Aksi</th>}
+                  {isITSupport && <th style={{ textAlign: 'center' }}>Aksi</th>}
                 </tr>
               </thead>
               <tbody>
@@ -270,8 +313,7 @@ export default function VisitsPage() {
                     </td>
                     <td><span className={`status ${visit.status === 'SELESAI' ? 'done' : 'pending'}`}>{visit.status}</span></td>
                     
-                    {/* Tombol Aksi (Edit & Hapus) HANYA TAMPIL untuk IT Support */}
-                    {!isRestrictedRole && (
+                    {isITSupport && (
                       <td style={{ textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                           <button 
@@ -299,7 +341,6 @@ export default function VisitsPage() {
         ) : <EmptyState message="Tidak ada data kunjungan yang cocok dengan pencarian." />}
       </section>
 
-      {/* MODAL FILTER TANGGAL EKSPOR EXCEL */}
       {showExportModal && (
         <div className="modal-backdrop">
           <div className="modal" style={{ width: '100%', maxWidth: '420px', padding: '24px 32px' }}>
@@ -335,8 +376,7 @@ export default function VisitsPage() {
         </div>
       )}
 
-      {/* MODAL TAMBAH / EDIT KUNJUNGAN */}
-      {create && !isRestrictedRole && (
+      {create && isITSupport && (
         <div className="modal-backdrop">
           <div className="modal visit-modal" style={{ width: '100%', maxWidth: '620px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: '24px 32px' }}>
             <button type="button" className="modal-close" onClick={() => { setCreate(false); setEditingVisit(null); setSelectedBranches([]); setSelectedCategories([]); }}><FiX /></button>

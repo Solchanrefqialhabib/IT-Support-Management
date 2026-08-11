@@ -63,7 +63,7 @@ export const createVisit = async (req, res) => {
     if (req.user.role === "ADMIN" || req.user.role === "SUPERVISOR") {
       return res.status(403).json({
         success: false,
-        message: "Akun Administrator / Supervisor tidak diizinkan mencatat kunjungan lapangan. Tugas ini khusus untuk IT Support."
+        message: "Akun Administrator / Supervisor hanya sebagai pemantau dan tidak diizinkan mencatat kunjungan lapangan."
       });
     }
 
@@ -116,6 +116,7 @@ export const createVisit = async (req, res) => {
       },
     });
 
+    // PERBAIKAN WA: Pastikan pengiriman pesan tidak memblokir respon sukses jika nomor WA belum diset
     const targetNumber = process.env.WA_GROUP_NUMBER || process.env.WA_TARGET_NUMBER;
     if (targetNumber) {
       const message = `🔔 *LAPORAN KUNJUNGAN BARU*\n\n` +
@@ -200,7 +201,6 @@ export const deleteVisit = async (req, res) => {
       return res.status(404).json({ success: false, message: "Kunjungan tidak ditemukan" });
     }
 
-    // Admin bebas menghapus data apa saja, IT Support hanya miliknya sendiri
     if (req.user.role !== "ADMIN" && visit.userId !== req.user.id) {
       return res.status(403).json({ success: false, message: "Akses ditolak" });
     }

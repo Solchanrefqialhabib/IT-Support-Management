@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function ReturnsPage() {
   const { user } = useAuth();
-  const isSupervisor = user?.role === 'SUPERVISOR';
+  const isITSupport = user?.role === 'IT_SUPPORT';
 
   const [returns, setReturns] = useState([]);
   const [items, setItems] = useState([]);
@@ -48,11 +48,13 @@ export default function ReturnsPage() {
   }, []);
 
   const openCreateModal = () => {
+    if (!isITSupport) return;
     reset({ date: new Date().toISOString().slice(0, 10), quantity: 1, status: 'RUSAK', serialNumber: '', damage: '' });
     setCreateModal(true);
   };
 
   const onSubmit = async (values) => {
+    if (!isITSupport) return;
     try {
       const payload = {
         itemId: Number(values.itemId),
@@ -75,7 +77,7 @@ export default function ReturnsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (isSupervisor) return;
+    if (!isITSupport) return;
     Swal.fire({
       title: 'Hapus Data Return?',
       text: "Data yang dihapus tidak dapat dikembalikan.",
@@ -98,12 +100,14 @@ export default function ReturnsPage() {
   };
 
   const openStatusModal = (ret) => {
+    if (!isITSupport) return;
     setSelectedReturn(ret);
     setStatusValue('status', ret.status);
     setStatusModal(true);
   };
 
   const onUpdateStatus = async (values) => {
+    if (!isITSupport) return;
     try {
       await api.put(`/returns/${selectedReturn.id}/status`, { status: values.status });
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Status berhasil diperbarui!', background: '#09090b', color: '#fff', timer: 1500, showConfirmButton: false });
@@ -121,7 +125,7 @@ export default function ReturnsPage() {
         title="Pengembalian Aset (Return)" 
         description="Catat perangkat yang dikembalikan dari cabang, rusak, atau RMA." 
         action={
-          !isSupervisor && (
+          isITSupport && (
             <button className="primary-button" onClick={openCreateModal}>
               <FiPlus /> Catat Pengembalian
             </button>
@@ -143,7 +147,7 @@ export default function ReturnsPage() {
                   <th>Serial Number</th>
                   <th>Kendala/Kerusakan</th>
                   <th>Status</th>
-                  {!isSupervisor && <th style={{ textAlign: 'center' }}>Aksi</th>}
+                  {isITSupport && <th style={{ textAlign: 'center' }}>Aksi</th>}
                 </tr>
               </thead>
               <tbody>
@@ -162,7 +166,7 @@ export default function ReturnsPage() {
                         {ret.status}
                       </span>
                     </td>
-                    {!isSupervisor && (
+                    {isITSupport && (
                       <td style={{ textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                           <button 
@@ -193,7 +197,7 @@ export default function ReturnsPage() {
       </section>
 
       {/* MODAL RETURN BARU */}
-      {createModal && !isSupervisor && (
+      {createModal && isITSupport && (
         <div className="modal-backdrop">
           <div className="modal" style={{ width: '100%', maxWidth: '500px', padding: '24px 32px' }}>
             <button type="button" className="modal-close" onClick={() => setCreateModal(false)}><FiX /></button>
@@ -206,7 +210,6 @@ export default function ReturnsPage() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px', color: '#fff' }}>Barang yang dikembalikan</label>
@@ -294,7 +297,7 @@ export default function ReturnsPage() {
       )}
 
       {/* MODAL UPDATE STATUS RETURN */}
-      {statusModal && !isSupervisor && (
+      {statusModal && isITSupport && (
         <div className="modal-backdrop">
           <div className="modal" style={{ width: '100%', maxWidth: '400px', padding: '24px 32px' }}>
             <button type="button" className="modal-close" onClick={() => setStatusModal(false)}><FiX /></button>
