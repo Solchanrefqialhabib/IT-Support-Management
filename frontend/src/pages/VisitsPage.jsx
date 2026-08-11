@@ -207,8 +207,10 @@ export default function VisitsPage() {
 
   const exportExcelCustom = async () => {
     try {
+      const token = localStorage.getItem('token');
       const response = await api.get('/reports/visits', { 
         params: { startDate: exportStartDate, endDate: exportEndDate },
+        headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob' 
       });
       const url = window.URL.createObjectURL(new Blob([response.data || response]));
@@ -239,14 +241,12 @@ export default function VisitsPage() {
         description="Pencatatan aktivitas lapangan dan dokumentasi foto." 
         action={
           <div style={{ display: 'flex', gap: '10px' }}>
-            {/* Tombol Catat Kunjungan HANYA MUNCUL untuk IT Support */}
             {isITSupport && (
               <button className="primary-button" onClick={openCreateModal}>
                 <FiPlus /> Catat Kunjungan
               </button>
             )}
 
-            {/* Tombol Kirim Laporan WA HANYA MUNCUL untuk IT Support */}
             {isITSupport && (
               <button className="primary-button" style={{ background: '#22c55e', color: '#fff', border: 'none' }} onClick={handleSendDailyReportWA}>
                 <FiMessageSquare /> Kirim Laporan WA
@@ -306,8 +306,8 @@ export default function VisitsPage() {
                     <td><strong>{formatter.format(visit.allowance || visit.branch?.allowance || 0)}</strong></td>
                     <td>
                       <div style={{ display: 'flex', gap: '6px' }}>
-                        {visit.beforeImage && <a href={`http://localhost:5000${visit.beforeImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-blue)', fontSize: '11px', textDecoration: 'underline' }}>[Before]</a>}
-                        {visit.afterImage && <a href={`http://localhost:5000${visit.afterImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--success)', fontSize: '11px', textDecoration: 'underline' }}>[After]</a>}
+                        {visit.beforeImage && <a href={`http://43.156.145.125:5000${visit.beforeImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-blue)', fontSize: '11px', textDecoration: 'underline' }}>[Before]</a>}
+                        {visit.afterImage && <a href={`http://43.156.145.125:5000${visit.afterImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--success)', fontSize: '11px', textDecoration: 'underline' }}>[After]</a>}
                         {!visit.beforeImage && !visit.afterImage && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>-</span>}
                       </div>
                     </td>
