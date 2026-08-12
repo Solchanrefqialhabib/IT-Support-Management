@@ -252,24 +252,33 @@ td small { color: var(--text-muted); margin-top: 4px; font-size: 12px; display: 
   .login-aside { display: none; }
 }
 
-/* Penyesuaian Tombol Header Agar Otomatis Turun & Full Lebar di HP */
+/* --- OVERRIDE MUTLAK: MEMAKSA TOMBOL HEADER TURUN KE BAWAH DI HP (TERMASUK INLINE STYLE) --- */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column !important;
     align-items: stretch !important;
   }
 
+  /* Menargetkan kontainer aksi baik berupa kelas maupun inline style flex */
+  .page-header > div:last-child,
+  .page-header div[style*="display"],
   .page-header-actions {
-    width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
+    width: 100% !important;
     gap: 10px !important;
+    margin-top: 12px !important;
   }
 
-  .page-header-actions .primary-button,
-  .page-header-actions button {
+  .page-header div[style*="display"] > *,
+  .page-header-actions > *,
+  .page-header .primary-button,
+  .page-header button,
+  .page-header a {
     width: 100% !important;
+    display: flex !important;
     justify-content: center !important;
+    box-sizing: border-box !important;
   }
 }
 
