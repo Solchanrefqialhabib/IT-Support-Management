@@ -58,30 +58,52 @@ main { min-width: 0; background: var(--bg-main); width: 100%; }
 
 .page { max-width: 1420px; padding: clamp(16px, 4vw, 40px); margin: auto; width: 100%; box-sizing: border-box; }
 
-/* PAGE HEADER RESPONSIF UTAMA */
+/* PAGE HEADER RESPONSIF (MOBILE FIRST) */
 .page-header { 
   display: flex; 
-  justify-content: space-between; 
-  align-items: flex-start; 
-  gap: 20px; 
+  flex-direction: column; 
+  align-items: stretch; 
+  gap: 16px; 
   margin-bottom: 30px; 
-  flex-wrap: wrap; 
   width: 100%;
 }
 .page-header-text {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
 }
-.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--text-muted); font-family: 'Space Mono', monospace; display: block; margin-bottom: 8px;}
-.page-header h1 { margin: 0; font-size: clamp(22px, 3vw, 28px); color: var(--text-main); }
-.page-header p { color: var(--text-muted); margin: 6px 0 0; font-size: 14px; }
+.eyebrow { 
+  font-size: 11px; 
+  font-weight: 500; 
+  letter-spacing: 1px; 
+  color: var(--text-muted); 
+  font-family: 'Space Mono', monospace; 
+  display: block; 
+  margin-bottom: 8px;
+}
+.page-header h1 { 
+  margin: 0; 
+  font-size: clamp(22px, 3vw, 28px); 
+  color: var(--text-main); 
+}
+.page-header p { 
+  color: var(--text-muted); 
+  margin: 6px 0 0; 
+  font-size: 14px; 
+}
 
-/* PAGE HEADER ACTIONS (KONTAINER TOMBOL) */
+/* KONTEN AKSI / TOMBOL DI HP (MENUMPUK KE BAWAH) */
 .page-header-actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
+  width: 100%;
+}
+.page-header-actions .primary-button,
+.page-header-actions button,
+.page-header-actions a {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
 }
 
 /* BUTTONS */
@@ -211,7 +233,27 @@ td small { color: var(--text-muted); margin-top: 4px; font-size: 12px; display: 
 .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 .login-card input { padding-left: 42px; height: 46px; }
 
-/* MEDIA QUERIES UNTUK LAYAR KECIL / HP */
+/* MEDIA QUERIES UNTUK TABLET & DESKTOP (>= 768px) */
+@media (min-width: 768px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-header-text {
+    flex: 1;
+  }
+  .page-header-actions {
+    flex-direction: row;
+    width: auto;
+  }
+  .page-header-actions .primary-button,
+  .page-header-actions button,
+  .page-header-actions a {
+    width: auto !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: 1fr; }
 }
@@ -250,36 +292,6 @@ td small { color: var(--text-muted); margin-top: 4px; font-size: 12px; display: 
   .topbar { padding: 0 16px; }
   .login-shell { grid-template-columns: 1fr; }
   .login-aside { display: none; }
-}
-
-/* --- OVERRIDE MUTLAK: MEMAKSA TOMBOL HEADER TURUN KE BAWAH DI HP (TERMASUK INLINE STYLE) --- */
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  /* Menargetkan kontainer aksi baik berupa kelas maupun inline style flex */
-  .page-header > div:last-child,
-  .page-header div[style*="display"],
-  .page-header-actions {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 10px !important;
-    margin-top: 12px !important;
-  }
-
-  .page-header div[style*="display"] > *,
-  .page-header-actions > *,
-  .page-header .primary-button,
-  .page-header button,
-  .page-header a {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-  }
 }
 
 @media (max-width: 480px) {
