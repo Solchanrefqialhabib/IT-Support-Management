@@ -240,7 +240,8 @@ export default function VisitsPage() {
         title="Log Kunjungan" 
         description="Pencatatan aktivitas lapangan dan dokumentasi foto." 
         action={
-          <div style={{ display: 'flex', gap: '10px' }}>
+          /* Menggunakan kelas CSS 'page-header-actions' menggantikan inline style agar responsif */
+          <div className="page-header-actions">
             {isITSupport && (
               <button className="primary-button" onClick={openCreateModal}>
                 <FiPlus /> Catat Kunjungan
