@@ -240,7 +240,6 @@ export default function VisitsPage() {
         title="Log Kunjungan" 
         description="Pencatatan aktivitas lapangan dan dokumentasi foto." 
         action={
-          /* Menggunakan kelas CSS 'page-header-actions' menggantikan inline style agar responsif */
           <div className="page-header-actions">
             {isITSupport && (
               <button className="primary-button" onClick={openCreateModal}>
@@ -292,50 +291,63 @@ export default function VisitsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredVisits.map((visit) => (
-                  <tr key={visit.id}>
-                    <td>{new Date(visit.date).toLocaleDateString('id-ID')}</td>
-                    <td><strong>{visit.branch?.name}</strong></td>
-                    <td>{visit.category}</td>
-                    <td><small>🕒 {visit.startTime || '08:00'} - {visit.endTime || '17:00'}</small></td>
-                    <td>
-                      <div style={{ fontSize: '11px', maxWidth: '220px' }}>
-                        <div><span style={{ color: 'var(--text-muted)' }}>Before:</span> {visit.beforeCondition || '-'}</div>
-                        <div style={{ marginTop: '2px' }}><span style={{ color: 'var(--text-muted)' }}>After:</span> {visit.solution || '-'}</div>
-                      </div>
-                    </td>
-                    <td><strong>{formatter.format(visit.allowance || visit.branch?.allowance || 0)}</strong></td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        {visit.beforeImage && <a href={`http://43.156.145.125:5000${visit.beforeImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-blue)', fontSize: '11px', textDecoration: 'underline' }}>[Before]</a>}
-                        {visit.afterImage && <a href={`http://43.156.145.125:5000${visit.afterImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--success)', fontSize: '11px', textDecoration: 'underline' }}>[After]</a>}
-                        {!visit.beforeImage && !visit.afterImage && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>-</span>}
-                      </div>
-                    </td>
-                    <td><span className={`status ${visit.status === 'SELESAI' ? 'done' : 'pending'}`}>{visit.status}</span></td>
-                    
-                    {isITSupport && (
-                      <td style={{ textAlign: 'center' }}>
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                          <button 
-                            onClick={() => openEditModal(visit)} 
-                            style={{ background: 'transparent', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer' }}
-                            title="Edit Kunjungan"
-                          >
-                            <FiEdit2 size={16} />
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteVisit(visit.id)} 
-                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
-                            title="Hapus Kunjungan"
-                          >
-                            <FiTrash2 size={16} />
-                          </button>
+                {filteredVisits.map((visit) => {
+                  // URL gambar dibuat dinamis mengikuti host server saat ini (baik IP publik maupun domain)
+                  const baseUrl = `${window.location.protocol}//${window.location.hostname}:5000`;
+                  
+                  return (
+                    <tr key={visit.id}>
+                      <td>{new Date(visit.date).toLocaleDateString('id-ID')}</td>
+                      <td><strong>{visit.branch?.name}</strong></td>
+                      <td>{visit.category}</td>
+                      <td><small>🕒 {visit.startTime || '08:00'} - {visit.endTime || '17:00'}</small></td>
+                      <td>
+                        <div style={{ fontSize: '11px', maxWidth: '220px' }}>
+                          <div><span style={{ color: 'var(--text-muted)' }}>Before:</span> {visit.beforeCondition || '-'}</div>
+                          <div style={{ marginTop: '2px' }}><span style={{ color: 'var(--text-muted)' }}>After:</span> {visit.solution || '-'}</div>
                         </div>
                       </td>
-                    )}
-                  </tr>
-                ))}
+                      <td><strong>{formatter.format(visit.allowance || visit.branch?.allowance || 0)}</strong></td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {visit.beforeImage && (
+                            <a href={`${baseUrl}${visit.beforeImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-blue)', fontSize: '11px', textDecoration: 'underline' }}>
+                              [Before]
+                            </a>
+                          )}
+                          {visit.afterImage && (
+                            <a href={`${baseUrl}${visit.afterImage}`} target="_blank" rel="noreferrer" style={{ color: 'var(--success)', fontSize: '11px', textDecoration: 'underline' }}>
+                              [After]
+                            </a>
+                          )}
+                          {!visit.beforeImage && !visit.afterImage && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>-</span>}
+                        </div>
+                      </td>
+                      <td><span className={`status ${visit.status === 'SELESAI' ? 'done' : 'pending'}`}>{visit.status}</span></td>
+                      
+                      {isITSupport && (
+                        <td style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button 
+                              onClick={() => openEditModal(visit)} 
+                              style={{ background: 'transparent', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer' }}
+                              title="Edit Kunjungan"
+                            >
+                              <FiEdit2 size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteVisit(visit.id)} 
+                              style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                              title="Hapus Kunjungan"
+                            >
+                              <FiTrash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
